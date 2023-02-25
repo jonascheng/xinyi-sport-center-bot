@@ -1,0 +1,6 @@
+.vscode/**
+.vagrant/**
+
+*.png
+chromedriver.exe
+clock-in-out.bat
