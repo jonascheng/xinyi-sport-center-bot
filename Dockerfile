@@ -58,7 +58,7 @@ RUN rm -rf /etc/localtime
 RUN ln -s /usr/share/zoneinfo/Singapore /etc/localtime
 
 # for cron #####
-RUN crontab -l | { cat; echo "0 0 * * * /opt/app-root/bin/python /app/selenium-with-headless-chrome.py > /tmp/app.log"; } | crontab -
+RUN crontab -l | { cat; echo "0 0 * * * (cd /app || exit 1; /opt/app-root/bin/python /app/selenium-with-headless-chrome.py > /tmp/app.log)"; } | crontab -
 RUN echo ID=$ID >> /etc/environment
 RUN echo PSWD=$PSWD >> /etc/environment
 RUN echo TRUECAPTCHA_USERID=$TRUECAPTCHA_USERID >> /etc/environment
