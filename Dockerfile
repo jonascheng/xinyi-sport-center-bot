@@ -57,11 +57,13 @@ RUN yum install -y cronie && yum clean all
 RUN rm -rf /etc/localtime
 RUN ln -s /usr/share/zoneinfo/Singapore /etc/localtime
 
-RUN crontab -l | { cat; echo "0 0 * * * /opt/app-root/bin/python /app/selenium-with-headless-chrome.py"; } | crontab -
-
-RUN echo EMPLOYEE_NO=$EMPLOYEE_NO >> /etc/environment
-RUN echo PSWD=$PSWD >> /etc/environment
 # for cron #####
+RUN crontab -l | { cat; echo "0 0 * * * /opt/app-root/bin/python /app/selenium-with-headless-chrome.py"; } | crontab -
+RUN echo ID=$ID >> /etc/environment
+RUN echo PSWD=$PSWD >> /etc/environment
+RUN echo TRUECAPTCHA_USERID=$TRUECAPTCHA_USERID >> /etc/environment
+RUN echo TRUECAPTCHA_APIKEY=$TRUECAPTCHA_APIKEY >> /etc/environment
+RUN echo WEBHOOK=$WEBHOOK >> /etc/environment
 
 WORKDIR /app
 
