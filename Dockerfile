@@ -57,8 +57,7 @@ RUN yum install -y cronie && yum clean all
 RUN rm -rf /etc/localtime
 RUN ln -s /usr/share/zoneinfo/Singapore /etc/localtime
 
-RUN crontab -l | { cat; echo "0 9 * * mon,tue,wed,thu,fri /opt/app-root/bin/python /app/selenium-with-headless-chrome.py"; } | crontab -
-RUN crontab -l | { cat; echo "0 18 * * mon,tue,wed,thu,fri /opt/app-root/bin/python /app/selenium-with-headless-chrome.py"; } | crontab -
+RUN crontab -l | { cat; echo "0 0 * * * /opt/app-root/bin/python /app/selenium-with-headless-chrome.py"; } | crontab -
 
 RUN echo EMPLOYEE_NO=$EMPLOYEE_NO >> /etc/environment
 RUN echo PSWD=$PSWD >> /etc/environment
@@ -70,5 +69,5 @@ WORKDIR /app
 COPY selenium-with-headless-chrome.py .
 COPY ./notify.tmpl ./notify.tmpl
 
-CMD [ "python", "selenium-with-headless-chrome.py" ]
-# CMD ["/usr/sbin/init"]
+# CMD [ "python", "selenium-with-headless-chrome.py" ]
+CMD ["/usr/sbin/init"]
