@@ -1,10 +1,16 @@
 FROM centos/python-38-centos7
 
-ARG EMPLOYEE_NO
+ARG ID
 ARG PSWD
+ARG TRUECAPTCHA_USERID
+ARG TRUECAPTCHA_APIKEY
+ARG WEBHOOK
 
-ENV EMPLOYEE_NO $EMPLOYEE_NO
+ENV ID $ID
 ENV PSWD $PSWD
+ENV TRUECAPTCHA_USERID $TRUECAPTCHA_USERID
+ENV TRUECAPTCHA_APIKEY $TRUECAPTCHA_APIKEY
+ENV WEBHOOK $WEBHOOK
 
 USER 0
 
@@ -62,6 +68,7 @@ WORKDIR /app
 
 # copy the testing python script
 COPY selenium-with-headless-chrome.py .
+COPY ./notify.tmpl ./notify.tmpl
 
 CMD [ "python", "selenium-with-headless-chrome.py" ]
 # CMD ["/usr/sbin/init"]
