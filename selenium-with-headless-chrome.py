@@ -298,6 +298,7 @@ try:
         NotifyTemplate("./notify.tmpl/notify.adaptive-card.tmpl", payload)
 
 except Exception as e:
+    print('exception: %s' % str(e))
     payload = {
         'date': date_week_to_book,
         'reason': str(e)
