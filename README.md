@@ -8,6 +8,7 @@
 
 ```console
 docker build \
+   --build-arg BOOK_WEEK_NAME="Thursday Friday Saturday Sunday" \
    --build-arg ID=your-login-id \
    --build-arg PSWD='your-secret' \
    --build-arg TRUECAPTCHA_USERID='truecaptcha-userid' \
@@ -19,5 +20,5 @@ docker build \
 2. run docker
 
 ```console
-docker run --rm --name=xinyi-bot -e BOOK_WEEK_NAME="Monday Wednesday" --privileged -d -v /tmp/xinyi-bot:/screenshots xinyi-bot
+docker run --rm --name=xinyi-bot --privileged -d -v /tmp/xinyi-bot:/screenshots xinyi-bot
 ```

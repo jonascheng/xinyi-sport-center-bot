@@ -1,11 +1,13 @@
 FROM centos/python-38-centos7
 
+ARG BOOK_WEEK_NAME
 ARG ID
 ARG PSWD
 ARG TRUECAPTCHA_USERID
 ARG TRUECAPTCHA_APIKEY
 ARG WEBHOOK
 
+ENV BOOK_WEEK_NAME $BOOK_WEEK_NAME
 ENV ID $ID
 ENV PSWD $PSWD
 ENV TRUECAPTCHA_USERID $TRUECAPTCHA_USERID
@@ -59,6 +61,7 @@ RUN ln -s /usr/share/zoneinfo/Singapore /etc/localtime
 
 # for cron #####
 RUN crontab -l | { cat; echo "0 0 * * * (cd /app || exit 1; /opt/app-root/bin/python /app/selenium-with-headless-chrome.py > /tmp/app.log)"; } | crontab -
+RUN echo BOOK_WEEK_NAME=$BOOK_WEEK_NAME >> /etc/environment
 RUN echo ID=$ID >> /etc/environment
 RUN echo PSWD=$PSWD >> /etc/environment
 RUN echo TRUECAPTCHA_USERID=$TRUECAPTCHA_USERID >> /etc/environment
