@@ -26,9 +26,12 @@ print('Intent to book %s' % book_date)
 # check if the date in desired weekday
 # get day of week as an integer, Monday is 0 and Sunday is 6
 week = book_date.weekday()
-print('Day of a week is %d' % week)
-
-if week in [3, 5, 6, 0, 1, 2]:
+# convert to week name
+week_name = book_date.strftime("%A")
+print('Day of a week is %s' % week_name)
+desired_book_week_name = os.environ.get('BOOK_WEEK_NAME', "Thursday")
+print('Day of a week is desired to book %s (env: BOOK_WEEK_NAME)' % desired_book_week_name)
+if week_name.lower() in desired_book_week_name.lower():
     print("It's the date to book")
 else:
     print("Skip to book")
@@ -253,6 +256,15 @@ def SaveResult():
     return '%s%s-Result.png' % (screenshots_path, current_time)
 
 
+def SaveLastScreen():
+    print("%s | SaveLastScreen" % driver.title)
+
+    if not driver.save_screenshot('%s%s-SaveLastScreen.png' % (screenshots_path, current_time)):
+        print('save SaveLastScreen failed')
+
+    return '%s%s-SaveLastScreen.png' % (screenshots_path, current_time)
+
+
 def NotifyTemplate(tmpl, payload):
     print("%s | Notify" % tmpl)
 
@@ -299,11 +311,18 @@ try:
 
 except Exception as e:
     print('exception: %s' % str(e))
-    payload = {
-        'date': date_week_to_book,
-        'reason': str(e)
-    }
-    NotifyTemplate("./notify.tmpl/notify.adaptive-card.err.tmpl", payload)
+
+    # save last error screen
+    result_img = SaveLastScreen()
+
+    with open(result_img, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode('ascii')
+        payload = {
+            'date': date_week_to_book,
+            'reason': str(e),
+            'img': encoded_string
+        }
+        NotifyTemplate("./notify.tmpl/notify.adaptive-card.err.tmpl", payload)
 
 
 # terminate driver session and close all windows

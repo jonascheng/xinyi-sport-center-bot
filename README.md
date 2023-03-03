@@ -19,5 +19,5 @@ docker build \
 2. run docker
 
 ```console
-docker run --rm --name=xinyi-bot --privileged -d -v /tmp/xinyi-bot:/screenshots xinyi-bot
+docker run --rm --name=xinyi-bot -e BOOK_WEEK_NAME="Monday Wednesday" --privileged -d -v /tmp/xinyi-bot:/screenshots xinyi-bot
 ```
