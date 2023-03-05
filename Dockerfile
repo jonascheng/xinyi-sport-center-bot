@@ -6,6 +6,8 @@ ARG PSWD
 ARG TRUECAPTCHA_USERID
 ARG TRUECAPTCHA_APIKEY
 ARG WEBHOOK
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
 
 ENV BOOK_WEEK_NAME $BOOK_WEEK_NAME
 ENV ID $ID
@@ -13,6 +15,9 @@ ENV PSWD $PSWD
 ENV TRUECAPTCHA_USERID $TRUECAPTCHA_USERID
 ENV TRUECAPTCHA_APIKEY $TRUECAPTCHA_APIKEY
 ENV WEBHOOK $WEBHOOK
+ENV AWS_DEFAULT_REGION ap-northeast-1
+ENV AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
+ENV AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY
 
 USER 0
 
@@ -32,7 +37,7 @@ RUN cd /usr/share/fonts/chinese/ && unzip Noto_Sans_TC.zip
 RUN cd /usr/share/fonts/chinese/ && fc-cache -fv
 
 # install selenium
-RUN pip install selenium requests
+RUN pip install selenium requests icalendar boto3
 
 # download chromedriver
 RUN mkdir /opt/chrome
@@ -67,6 +72,9 @@ RUN echo PSWD=$PSWD >> /etc/environment
 RUN echo TRUECAPTCHA_USERID=$TRUECAPTCHA_USERID >> /etc/environment
 RUN echo TRUECAPTCHA_APIKEY=$TRUECAPTCHA_APIKEY >> /etc/environment
 RUN echo WEBHOOK=$WEBHOOK >> /etc/environment
+RUN echo AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION >> /etc/environment
+RUN echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> /etc/environment
+RUN echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> /etc/environment
 
 WORKDIR /app
 

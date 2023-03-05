@@ -14,6 +14,8 @@ docker build \
    --build-arg TRUECAPTCHA_USERID='truecaptcha-userid' \
    --build-arg TRUECAPTCHA_APIKEY='truecaptcha-apikey' \
    --build-arg WEBHOOK='teams-webhook-url' \
+   --build-arg AWS_ACCESS_KEY_ID='access-key-id-for-txone-badminton-ical' \
+   --build-arg AWS_SECRET_ACCESS_KEY='access-secret-key-for-txone-badminton-ical' \
    -t xinyi-bot .
 ```
 

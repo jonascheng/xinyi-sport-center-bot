@@ -2,6 +2,7 @@ import os
 import re
 import time
 import json
+import boto3
 import base64
 import platform
 import requests
@@ -9,6 +10,9 @@ import requests
 from string import Template
 
 from datetime import timedelta, date, datetime
+
+from icalendar import Calendar, Event, vCalAddress, vText
+from botocore.exceptions import ClientError
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -18,6 +22,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from selenium.common.exceptions import TimeoutException
+
+# constant variables
+DESIRED_BOOK_DT_START_HOUR = 12
+DESIRED_BOOK_DT_END_HOUR = 13
+DESIRED_BOOK_TIMESLOT = '%d:00~%d:00' % (DESIRED_BOOK_DT_START_HOUR, DESIRED_BOOK_DT_END_HOUR)
+BUCKET_NAME = 'txone-badminton-ical'
 
 # calcuate book date, now + 13day
 book_date = date.today() + timedelta(days=13)
@@ -62,6 +72,54 @@ driver.fullscreen_window()
 driver.get("https://xs.teamxports.com/xs03.aspx?module=login_page&files=login")
 # accept alert all the time
 driver.switch_to.alert.accept()
+
+
+def GeneratePresignedURL(zone):
+    # the object name to upload and 30 days in second to expire
+    expiration = 30*24*60*60
+    object_name = '%s.ics' % current_time
+
+    cal = Calendar()
+
+    event = Event()
+    event.add('summary', '羽球社團活動')
+    event.add('dtstart', datetime(book_date.year, book_date.month, book_date.day, DESIRED_BOOK_DT_START_HOUR, 0, 0))
+    event.add('dtend', datetime(book_date.year, book_date.month, book_date.day, DESIRED_BOOK_DT_END_HOUR, 0, 0))
+    event.add('dtstamp', datetime(book_date.year, book_date.month, book_date.day, 0, 0, 0))
+
+    organizer = vCalAddress('MAILTO:hatsune@txone.com')
+    organizer.params['cn'] = vText('Hatsune Miku')
+    organizer.params['role'] = vText('Assistant')
+
+    event['organizer'] = organizer
+    event['location'] = vText('信義運動中心 %s' % zone)
+
+    # Adding events to calendar and generate ical
+    cal.add_component(event)
+    event_ics = '%s%s' % ('/tmp/', object_name)
+    print("ics file will be generated at ", event_ics)
+    with open(event_ics, 'wb') as ics:
+        ics.write(cal.to_ical())
+
+    # upload ical
+    s3_client = boto3.client("s3")
+    try:
+        response = s3_client.upload_file(event_ics, BUCKET_NAME, object_name)
+    except ClientError as e:
+        print('upload ical to S3 failed: %s' % str(e))
+        return ""
+
+    # generate presigned url
+    try:
+        response = s3_client.generate_presigned_url('get_object',
+                                                    Params={'Bucket': BUCKET_NAME,
+                                                            'Key': object_name},
+                                                    ExpiresIn=expiration)
+    except ClientError as e:
+        print('generate presigned failed: %s' % str(e))
+        return ""
+
+    return response
 
 
 def CaptchaImg2Text(captcha_img, userid, apikey):
@@ -231,7 +289,7 @@ def WantBookTime(date_to_book):
     btns = driver.find_elements(By.CSS_SELECTOR, "img[name='PlaceBtn']")
     for btn in btns:
         # print(btn.get_attribute("onclick"))
-        if '12:00~13:00' in btn.get_attribute("onclick"):
+        if DESIRED_BOOK_TIMESLOT in btn.get_attribute("onclick"):
             m = re.search(r'羽.', btn.get_attribute("onclick"))
             print(m.group())
             btn.click()
@@ -299,13 +357,17 @@ try:
     zone = WantBookTime(date_to_book)
     # save result
     result_img = SaveResult()
+    # generate ical link
+    ical_url = GeneratePresignedURL(zone)
 
     with open(result_img, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read()).decode('ascii')
         payload = {
             'date': date_week_to_book,
+            'time': DESIRED_BOOK_TIMESLOT,
             'zone': zone,
-            'img': encoded_string
+            'img': encoded_string,
+            'ical_url': ical_url
         }
         NotifyTemplate("./notify.tmpl/notify.adaptive-card.tmpl", payload)
 
@@ -319,6 +381,7 @@ except Exception as e:
         encoded_string = base64.b64encode(image_file.read()).decode('ascii')
         payload = {
             'date': date_week_to_book,
+            'time': DESIRED_BOOK_TIMESLOT,
             'reason': str(e),
             'img': encoded_string
         }

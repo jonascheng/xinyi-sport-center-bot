@@ -13,13 +13,25 @@
                         "size": "large",
                         "weight": "bolder",
                         "color": "good",
-                        "text": "(Beta) $date, 信義運動中心, $zone, 12:00 ~ 13:00",
+                        "text": "(Beta) $date, 信義運動中心, $zone, $time",
                         "wrap": true
                     },
                     {
                         "type": "Image",
                         "url": "data:image/png;base64,$img",
                         "style": "default"
+                    }
+                ],
+                "actions": [
+                    {
+                        "type": "Action.OpenUrl",
+                        "title": "網路預約平台",
+                        "url": "https://xs.teamxports.com/xs03.aspx?module=login_page&files=login&PT=1"
+                    },
+                    {
+                        "type": "Action.OpenUrl",
+                        "title": "加到行事曆",
+                        "url": "$ical_url"
                     }
                 ],
                 "schema": "http://adaptivecards.io/schemas/adaptive-card.json",

@@ -2,5 +2,6 @@
 .vagrant/**
 
 *.png
+*.ics
 chromedriver.exe
 clock-in-out.bat
