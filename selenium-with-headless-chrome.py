@@ -52,7 +52,7 @@ current_time = now.strftime("%Y-%m-%d-%H-%M-%S")
 date_to_book = book_date.strftime("%Y/%m/%d")
 date_week_to_book = book_date.strftime("%Y/%m/%d (%A)")
 
-timeout = 10
+timeout = 5
 
 chrome_options = Options()
 chrome_options.add_argument("--headless")
