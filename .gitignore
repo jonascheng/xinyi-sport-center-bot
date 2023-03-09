@@ -5,3 +5,5 @@
 *.ics
 chromedriver.exe
 clock-in-out.bat
+
+.python-version

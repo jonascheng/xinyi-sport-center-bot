@@ -29,8 +29,14 @@ DESIRED_BOOK_DT_END_HOUR = 13
 DESIRED_BOOK_TIMESLOT = '%d:00~%d:00' % (DESIRED_BOOK_DT_START_HOUR, DESIRED_BOOK_DT_END_HOUR)
 BUCKET_NAME = 'txone-badminton-ical'
 
-# calcuate book date, now + 13day
+# calcuate book date, now() + 13day
+now = datetime.now()
+current_time = now.strftime("%Y-%m-%d-%H-%M-%S")
 book_date = date.today() + timedelta(days=13)
+if now.hour >= 23 and now.minute >= 55:
+    # calcuate book date, now(23:5x) + 14day
+    book_date = date.today() + timedelta(days=14)
+
 print('Intent to book %s' % book_date)
 
 # check if the date in desired weekday
@@ -47,8 +53,6 @@ else:
     print("Skip to book")
     exit()
 
-now = datetime.now()
-current_time = now.strftime("%Y-%m-%d-%H-%M-%S")
 date_to_book = book_date.strftime("%Y/%m/%d")
 date_week_to_book = book_date.strftime("%Y/%m/%d (%A)")
 
