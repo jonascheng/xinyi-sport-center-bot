@@ -41,7 +41,7 @@ RUN pip install selenium requests icalendar boto3
 
 # download chromedriver
 RUN mkdir /opt/chrome
-RUN curl -O https://chromedriver.storage.googleapis.com/110.0.5481.77/chromedriver_linux64.zip
+RUN curl -O https://chromedriver.storage.googleapis.com/112.0.5615.49/chromedriver_linux64.zip
 RUN unzip chromedriver_linux64.zip -d /opt/chrome
 
 VOLUME [ "/screenshots" ]
