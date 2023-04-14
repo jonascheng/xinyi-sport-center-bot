@@ -240,7 +240,8 @@ def WantBookDate(date_to_book):
     print("%s | WantBookDate" % driver.title)
 
     # max retry 30 min
-    retry = int((30 * 60) / timeout)
+    sleep = 1
+    retry = int((30 * 60) / sleep)
 
     for i in range(0, retry):
         # wait for page loading
@@ -263,8 +264,8 @@ def WantBookDate(date_to_book):
                 # early return
                 return
 
-        # pause 10-second, reload page until the desired date is available
-        time.sleep(timeout)
+        # pause 1-second, reload page until the desired date is available
+        time.sleep(sleep)
         driver.refresh()
 
     # reach max retry
