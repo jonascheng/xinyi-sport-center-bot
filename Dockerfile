@@ -26,10 +26,6 @@ RUN yum install unzip -y
 RUN curl -O https://bootstrap.pypa.io/get-pip.py
 RUN python get-pip.py
 
-# install headless chrome
-RUN curl -O https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
-RUN yum install google-chrome-stable_current_x86_64.rpm -y
-
 # install traditional chinese font
 RUN mkdir -p /usr/share/fonts/chinese/
 RUN curl -o /usr/share/fonts/chinese/Noto_Sans_TC.zip https://fonts.google.com/download?family=Noto%20Sans%20TC
@@ -38,11 +34,6 @@ RUN cd /usr/share/fonts/chinese/ && fc-cache -fv
 
 # install selenium
 RUN pip install selenium requests icalendar boto3
-
-# download chromedriver
-RUN mkdir /opt/chrome
-RUN curl -O https://chromedriver.storage.googleapis.com/112.0.5615.49/chromedriver_linux64.zip
-RUN unzip chromedriver_linux64.zip -d /opt/chrome
 
 VOLUME [ "/screenshots" ]
 
@@ -63,6 +54,15 @@ RUN yum install -y cronie && yum clean all
 
 RUN rm -rf /etc/localtime
 RUN ln -s /usr/share/zoneinfo/Singapore /etc/localtime
+
+# download chromedriver
+RUN mkdir /opt/chrome
+RUN curl -O https://chromedriver.storage.googleapis.com/112.0.5615.49/chromedriver_linux64.zip
+RUN unzip chromedriver_linux64.zip -d /opt/chrome
+
+# install headless chrome
+RUN curl -O https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+RUN yum install google-chrome-stable_current_x86_64.rpm -y
 
 # for cron #####
 RUN crontab -l | { cat; echo "59 23 * * * (cd /app || exit 1; /opt/app-root/bin/python /app/selenium-with-headless-chrome.py > /tmp/app.log)"; } | crontab -
