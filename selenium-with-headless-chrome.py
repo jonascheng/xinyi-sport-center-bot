@@ -239,9 +239,9 @@ def AgreeEula():
 def WantBookDate(date_to_book):
     print("%s | WantBookDate" % driver.title)
 
-    # max retry 30 min
-    sleep = 1
-    retry = int((30 * 60) / sleep)
+    # max retry 10 min
+    sleep = 0.2
+    retry = int((10 * 60) / sleep)
 
     for i in range(0, retry):
         # wait for page loading
@@ -264,7 +264,7 @@ def WantBookDate(date_to_book):
                 # early return
                 return
 
-        # pause 1-second, reload page until the desired date is available
+        # pause and reload page until the desired date is available
         time.sleep(sleep)
         driver.refresh()
 

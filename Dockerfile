@@ -65,7 +65,7 @@ RUN curl -O https://dl.google.com/linux/direct/google-chrome-stable_current_x86_
 RUN yum install google-chrome-stable_current_x86_64.rpm -y
 
 # for cron #####
-RUN crontab -l | { cat; echo "59 23 * * * (cd /app || exit 1; /opt/app-root/bin/python /app/selenium-with-headless-chrome.py > /tmp/app.log)"; } | crontab -
+RUN crontab -l | { cat; echo "59 23 * * * (cd /app || exit 1; /opt/app-root/bin/python /app/selenium-with-headless-chrome.py >> /tmp/app.log)"; } | crontab -
 RUN echo BOOK_WEEK_NAME=$BOOK_WEEK_NAME >> /etc/environment
 RUN echo ID=$ID >> /etc/environment
 RUN echo PSWD=$PSWD >> /etc/environment
