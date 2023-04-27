@@ -64,6 +64,7 @@ chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-remote-fonts")
 chrome_options.add_argument("--lang=zh-TW")
+chrome_options.add_argument("--window-size=1024,1024")
 
 screenshots_path = '/screenshots/'
 if platform.system() == 'Windows':
@@ -281,7 +282,7 @@ def WantBookTime(date_to_book):
         raise Exception('%s | WantBookTime | Timed out waiting for page to load' % driver.title)
 
     # debug purpose
-    if not driver.save_screenshot('%s%s-WantBookTime.png' % (screenshots_path, current_time)):
+    if not driver.save_screenshot('%s%s-WantBookTime1.png' % (screenshots_path, current_time)):
         print('save WantBookTime failed')
 
     # execute script to select afternoon
@@ -289,6 +290,13 @@ def WantBookTime(date_to_book):
     var date = arguments[0];
     GoToStep2(date, '2');
     """, date_to_book)
+
+    # debug purpose
+    if not driver.save_screenshot('%s%s-WantBookTime2.png' % (screenshots_path, current_time)):
+        print('save WantBookTime failed')
+
+    # display human readable time in milliseconds
+    print("seen book time at %s" % datetime.now())
 
     # select all "PlaceBtn"
     btns = driver.find_elements(By.CSS_SELECTOR, "img[name='PlaceBtn']")
