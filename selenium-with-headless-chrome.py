@@ -300,7 +300,8 @@ def WantBookTime(date_to_book):
 
     # select all "PlaceBtn"
     btns = driver.find_elements(By.CSS_SELECTOR, "img[name='PlaceBtn']")
-    for btn in btns:
+    # loop through all btns in reverse order
+    for btn in btns.reverse():
         # print(btn.get_attribute("onclick"))
         if DESIRED_BOOK_TIMESLOT in btn.get_attribute("onclick"):
             m = re.search(r'羽.', btn.get_attribute("onclick"))
