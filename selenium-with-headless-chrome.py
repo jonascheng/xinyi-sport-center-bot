@@ -241,7 +241,7 @@ def WantBookDate(date_to_book):
     print("%s | WantBookDate" % driver.title)
 
     # max retry 10 min
-    sleep = 0.2
+    sleep = 0.1
     retry = int((10 * 60) / sleep)
 
     for i in range(0, retry):
