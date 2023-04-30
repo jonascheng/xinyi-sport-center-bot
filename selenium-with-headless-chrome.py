@@ -407,7 +407,7 @@ try:
             'img': encoded_string,
             'ical_url': ical_url
         }
-        # NotifyTemplate("./notify.tmpl/notify.adaptive-card.tmpl", payload)
+        NotifyTemplate("./notify.tmpl/notify.adaptive-card.tmpl", payload)
 
 except Exception as e:
     logger.error('Exception: %s' % str(e))
@@ -423,7 +423,7 @@ except Exception as e:
             'reason': str(e),
             'img': encoded_string
         }
-        # NotifyTemplate("./notify.tmpl/notify.adaptive-card.err.tmpl", payload)
+        NotifyTemplate("./notify.tmpl/notify.adaptive-card.err.tmpl", payload)
 
 
 # terminate driver session and close all windows
