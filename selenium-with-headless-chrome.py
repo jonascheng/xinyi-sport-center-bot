@@ -6,6 +6,7 @@ import boto3
 import base64
 import platform
 import requests
+import logging
 
 from string import Template
 
@@ -23,6 +24,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from selenium.common.exceptions import TimeoutException
 
+
 # constant variables
 DESIRED_BOOK_DT_START_HOUR = 12
 DESIRED_BOOK_DT_END_HOUR = 13
@@ -37,20 +39,35 @@ if now.hour >= 23 and now.minute >= 55:
     # calcuate book date, now(23:5x) + 14day
     book_date = date.today() + timedelta(days=14)
 
-print('Intent to book %s' % book_date)
+# init a logger that will be used to log in a file /tmp/app.log as well as stdout
+logger = logging.getLogger()
+logFormatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
+fileHandler = logging.FileHandler("/tmp/app-%s.log" % current_time)
+fileHandler.setFormatter(logFormatter)
+logger.addHandler(fileHandler)
+consoleHandler = logging.StreamHandler()
+consoleHandler.setFormatter(logFormatter)
+logger.addHandler(consoleHandler)
+logger.setLevel(logging.INFO)
+
+
+logger.info('Current time is %s' % current_time)
+logger.info('Intent to book %s' % book_date)
 
 # check if the date in desired weekday
 # get day of week as an integer, Monday is 0 and Sunday is 6
 week = book_date.weekday()
 # convert to week name
 week_name = book_date.strftime("%A")
-print('Day of a week is %s' % week_name)
+logger.info('Day of a week is %s' % week_name)
 desired_book_week_name = os.environ.get('BOOK_WEEK_NAME', "Thursday")
-print('Day of a week is desired to book %s (env: BOOK_WEEK_NAME)' % desired_book_week_name)
+book_time_in_reverse_order = (os.environ.get('BOOK_TIME_IN_REVERSE_ORDER', 'False') == 'True')
+
+logger.info('Day of a week is desired to book %s (env: BOOK_WEEK_NAME)' % desired_book_week_name)
 if week_name.lower() in desired_book_week_name.lower():
-    print("It's the date to book")
+    logger.info("It's the date to book")
 else:
-    print("Skip to book")
+    logger.info("Skip to book")
     exit()
 
 date_to_book = book_date.strftime("%Y/%m/%d")
@@ -102,7 +119,7 @@ def GeneratePresignedURL(zone):
     # Adding events to calendar and generate ical
     cal.add_component(event)
     event_ics = '%s%s' % ('/tmp/', object_name)
-    print("ics file will be generated at ", event_ics)
+    logger.info("ics file will be generated at %s" % event_ics)
     with open(event_ics, 'wb') as ics:
         ics.write(cal.to_ical())
 
@@ -111,7 +128,7 @@ def GeneratePresignedURL(zone):
     try:
         response = s3_client.upload_file(event_ics, BUCKET_NAME, object_name)
     except ClientError as e:
-        print('upload ical to S3 failed: %s' % str(e))
+        logger.error('upload ical to S3 failed: %s' % str(e))
         return ""
 
     # generate presigned url
@@ -121,7 +138,7 @@ def GeneratePresignedURL(zone):
                                                             'Key': object_name},
                                                     ExpiresIn=expiration)
     except ClientError as e:
-        print('generate presigned failed: %s' % str(e))
+        logger.error('generate presigned failed: %s' % str(e))
         return ""
 
     return response
@@ -143,7 +160,7 @@ def CaptchaImg2Text(captcha_img, userid, apikey):
 
 
 def Login():
-    print("%s | Login" % driver.title)
+    logger.info("%s | Login" % driver.title)
 
     # wait for page loading
     try:
@@ -153,7 +170,7 @@ def Login():
 
     # debug purpose
     # html = driver.page_source
-    # print(html)
+    # logger.info(html)
 
     # download captcha
     img_base64 = driver.execute_script("""
@@ -189,17 +206,17 @@ def Login():
 
     # debug purpose
     if not driver.save_screenshot('%s%s-Login.png' % (screenshots_path, current_time)):
-        print('save Login failed')
+        logger.error('%s | Login | Save Login failed' % driver.title)
 
     # click on login btn
     login_btn = driver.find_element(By.ID, 'login_but')
     login_btn.click()
 
-    print("%s | Login successfully" % driver.title)
+    logger.info("%s | Login successfully" % driver.title)
 
 
 def WantBookBadminton():
-    print("%s | WantBookBadminton" % driver.title)
+    logger.info("%s | WantBookBadminton" % driver.title)
 
     # wait for page loading
     try:
@@ -209,7 +226,7 @@ def WantBookBadminton():
 
     # debug purpose
     if not driver.save_screenshot('%s%s-WantBookBadminton.png' % (screenshots_path, current_time)):
-        print('save WantBookBadminton failed')
+        logger.error('%s | WantBookBadminton | Save WantBookBadminton failed' % driver.title)
 
     # click on btn
     badminton_btn = driver.find_element(By.CSS_SELECTOR, "img[title='羽球']")
@@ -217,7 +234,7 @@ def WantBookBadminton():
 
 
 def AgreeEula():
-    print("%s | AgreeEula" % driver.title)
+    logger.info("%s | AgreeEula" % driver.title)
 
     # wait for page loading
     try:
@@ -227,7 +244,7 @@ def AgreeEula():
 
     # debug purpose
     if not driver.save_screenshot('%s%s-AgreeEula.png' % (screenshots_path, current_time)):
-        print('save AgreeEula failed')
+        logger.error('%s | AgreeEula | Save AgreeEula failed' % driver.title)
 
     # click on btn
     badminton_btn = driver.find_element(By.CSS_SELECTOR, "img[src='img/conf01.png']")
@@ -238,7 +255,7 @@ def AgreeEula():
 
 
 def WantBookDate(date_to_book):
-    print("%s | WantBookDate" % driver.title)
+    logger.info("%s | WantBookDate" % driver.title)
 
     # max retry 10 min
     sleep = 0.1
@@ -252,16 +269,18 @@ def WantBookDate(date_to_book):
             raise Exception('%s | WantBookDate | Timed out waiting for page to load' % driver.title)
 
         # debug purpose
-        print('retry count %d' % i)
+        logger.info('%s | WantBookDate | Retry count %d' % (driver.title, i))
         if not driver.save_screenshot('%s%s-WantBookDate.png' % (screenshots_path, current_time)):
-            print('save WantBookDate failed')
+            logger.error('%s | WantBookDate | Save WantBookDate failed' % driver.title)
+        logger.info('%s | WantBookDate | (%d) %s%s-WantBookDate.png was saved' % (driver.title, i, screenshots_path, current_time))
 
         # select all "img/NewDataSelect.png"
         btns = driver.find_elements(By.CSS_SELECTOR, "img[src='img/NewDataSelect.png']")
         for btn in btns:
-            # print(btn.get_attribute("onclick"))
+            # logger.info(btn.get_attribute("onclick"))
             if date_to_book in btn.get_attribute("onclick"):
                 btn.click()
+                logger.info("%s | WantBookDate | %s was selected" % (driver.title, date_to_book))
                 # early return
                 return
 
@@ -272,8 +291,9 @@ def WantBookDate(date_to_book):
     # reach max retry
     raise Exception('%s | WantBookDate | Timed out waiting for desired date %s available' % (driver.title, date_to_book))
 
+
 def WantBookTime(date_to_book):
-    print("%s | WantBookTime" % driver.title)
+    logger.info("%s | WantBookTime" % driver.title)
 
     # wait for page loading
     try:
@@ -283,39 +303,42 @@ def WantBookTime(date_to_book):
 
     # debug purpose
     if not driver.save_screenshot('%s%s-WantBookTime1.png' % (screenshots_path, current_time)):
-        print('save WantBookTime failed')
+        logger.error('%s | WantBookTime | Save WantBookTime failed' % driver.title)
+    logger.info('%s | WantBookDate | %s%s-WantBookTime1.png was saved' % (driver.title, screenshots_path, current_time))
 
     # execute script to select afternoon
     driver.execute_script("""
     var date = arguments[0];
     GoToStep2(date, '2');
     """, date_to_book)
+    logger.info("%s | WantBookTime | %s was selected" % (driver.title, date_to_book))
 
     # debug purpose
     if not driver.save_screenshot('%s%s-WantBookTime2.png' % (screenshots_path, current_time)):
-        print('save WantBookTime failed')
-
-    # display human readable time in milliseconds
-    print("seen book time at %s" % datetime.now())
+        logger.error('%s | WantBookTime | Save WantBookTime failed' % driver.title)
+    logger.info('%s | WantBookDate | %s%s-WantBookTime2.png was saved' % (driver.title, screenshots_path, current_time))
 
     # select all "PlaceBtn"
     btns = driver.find_elements(By.CSS_SELECTOR, "img[name='PlaceBtn']")
     # loop through all btns in reverse order
-    btns.reverse()
+    if book_time_in_reverse_order:
+        logger.info("%s | WantBookTime | Book time in reverse order" % driver.title)
+        btns.reverse()
     for btn in btns:
-        # print(btn.get_attribute("onclick"))
+        # logger.info(btn.get_attribute("onclick"))
         if DESIRED_BOOK_TIMESLOT in btn.get_attribute("onclick"):
             m = re.search(r'羽.', btn.get_attribute("onclick"))
-            print(m.group())
+            logger.info('%s | WantBookTime | Intent to select %s ' % (driver.title, m.group()))
             btn.click()
             # accept alert
             driver.switch_to.alert.accept()
+            logger.info('%s | WantBookTime | %s was selected' % (driver.title, m.group()))
             # early return
             return m.group()
 
 
 def SaveResult():
-    print("%s | SaveResult" % driver.title)
+    logger.info("%s | SaveResult" % driver.title)
 
     # wait for page loading
     try:
@@ -324,22 +347,22 @@ def SaveResult():
         raise Exception('%s | SaveResult | Timed out waiting for page to load' % driver.title)
 
     if not driver.save_screenshot('%s%s-Result.png' % (screenshots_path, current_time)):
-        print('save Result failed')
+        logger.error('%s | SaveResult | Save Result failed' % driver.title)
 
     return '%s%s-Result.png' % (screenshots_path, current_time)
 
 
 def SaveLastScreen():
-    print("%s | SaveLastScreen" % driver.title)
+    logger.info("%s | SaveLastScreen" % driver.title)
 
     if not driver.save_screenshot('%s%s-SaveLastScreen.png' % (screenshots_path, current_time)):
-        print('save SaveLastScreen failed')
+        logger.error('%s | SaveLastScreen | Save SaveLastScreen failed' % driver.title)
 
     return '%s%s-SaveLastScreen.png' % (screenshots_path, current_time)
 
 
 def NotifyTemplate(tmpl, payload):
-    print("%s | Notify" % tmpl)
+    logger.info("%s | Notify" % tmpl)
 
     url = os.environ['WEBHOOK']
 
@@ -350,11 +373,11 @@ def NotifyTemplate(tmpl, payload):
         # convert string to dict
         data = json.loads(result)
         # debug purpose
-        # print(data)
+        # logger.info(data)
 
         response = requests.post(url=url, json=data)
         if response.ok:
-            print("%s | Notify successfully" % tmpl)
+            logger.info("%s | Notify successfully" % tmpl)
         else:
             requests.raise_for_status()
 
@@ -384,10 +407,10 @@ try:
             'img': encoded_string,
             'ical_url': ical_url
         }
-        NotifyTemplate("./notify.tmpl/notify.adaptive-card.tmpl", payload)
+        # NotifyTemplate("./notify.tmpl/notify.adaptive-card.tmpl", payload)
 
 except Exception as e:
-    print('exception: %s' % str(e))
+    logger.error('Exception: %s' % str(e))
 
     # save last error screen
     result_img = SaveLastScreen()
@@ -400,7 +423,7 @@ except Exception as e:
             'reason': str(e),
             'img': encoded_string
         }
-        NotifyTemplate("./notify.tmpl/notify.adaptive-card.err.tmpl", payload)
+        # NotifyTemplate("./notify.tmpl/notify.adaptive-card.err.tmpl", payload)
 
 
 # terminate driver session and close all windows
