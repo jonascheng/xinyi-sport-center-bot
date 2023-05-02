@@ -67,21 +67,23 @@ RUN yum install google-chrome-stable_current_x86_64.rpm -y
 
 # for cron #####
 RUN crontab -l | { cat; echo "59 23 * * * (cd /app || exit 1; /opt/app-root/bin/python /app/selenium-with-headless-chrome.py >> /tmp/app.log)"; } | crontab -
-RUN echo BOOK_WEEK_NAME=$BOOK_WEEK_NAME >> /etc/environment
-RUN echo ID=$ID >> /etc/environment
-RUN echo PSWD=$PSWD >> /etc/environment
-RUN echo TRUECAPTCHA_USERID=$TRUECAPTCHA_USERID >> /etc/environment
-RUN echo TRUECAPTCHA_APIKEY=$TRUECAPTCHA_APIKEY >> /etc/environment
-RUN echo WEBHOOK=$WEBHOOK >> /etc/environment
-RUN echo AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION >> /etc/environment
-RUN echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> /etc/environment
-RUN echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> /etc/environment
+# RUN echo BOOK_WEEK_NAME=$BOOK_WEEK_NAME >> /etc/environment
+# RUN echo ID=$ID >> /etc/environment
+# RUN echo PSWD=$PSWD >> /etc/environment
+# RUN echo TRUECAPTCHA_USERID=$TRUECAPTCHA_USERID >> /etc/environment
+# RUN echo TRUECAPTCHA_APIKEY=$TRUECAPTCHA_APIKEY >> /etc/environment
+# RUN echo WEBHOOK=$WEBHOOK >> /etc/environment
+# RUN echo AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION >> /etc/environment
+# RUN echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> /etc/environment
+# RUN echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> /etc/environment
+# RUN echo BOOK_TIME_IN_REVERSE_ORDER=$BOOK_TIME_IN_REVERSE_ORDER >> /etc/environment
 
 WORKDIR /app
 
 # copy the testing python script
 COPY selenium-with-headless-chrome.py .
 COPY ./notify.tmpl ./notify.tmpl
+COPY ./entrypoint.sh ./entrypoint.sh
 
 # CMD [ "python", "selenium-with-headless-chrome.py" ]
-CMD ["/usr/sbin/init"]
+CMD ["entrypoint.sh"]
