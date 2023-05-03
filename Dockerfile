@@ -86,4 +86,4 @@ COPY ./notify.tmpl ./notify.tmpl
 COPY ./entrypoint.sh ./entrypoint.sh
 
 # CMD [ "python", "selenium-with-headless-chrome.py" ]
-CMD ["entrypoint.sh"]
+CMD ["/app/entrypoint.sh"]
