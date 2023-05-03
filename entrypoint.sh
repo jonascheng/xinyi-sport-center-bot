@@ -11,4 +11,5 @@ echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> /etc/environment
 echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> /etc/environment
 echo BOOK_TIME_IN_REVERSE_ORDER=$BOOK_TIME_IN_REVERSE_ORDER >> /etc/environment
 
-/usr/sbin/init
+# run systemd
+exec /usr/sbin/init
