@@ -304,7 +304,7 @@ def WantBookTime(date_to_book):
     # debug purpose
     if not driver.save_screenshot('%s%s-WantBookTime1.png' % (screenshots_path, current_time)):
         logger.error('%s | WantBookTime | Save WantBookTime failed' % driver.title)
-    logger.info('%s | WantBookDate | %s%s-WantBookTime1.png was saved' % (driver.title, screenshots_path, current_time))
+    logger.info('%s | WantBookTime | %s%s-WantBookTime1.png was saved' % (driver.title, screenshots_path, current_time))
 
     # execute script to select afternoon
     driver.execute_script("""
@@ -316,7 +316,7 @@ def WantBookTime(date_to_book):
     # debug purpose
     if not driver.save_screenshot('%s%s-WantBookTime2.png' % (screenshots_path, current_time)):
         logger.error('%s | WantBookTime | Save WantBookTime failed' % driver.title)
-    logger.info('%s | WantBookDate | %s%s-WantBookTime2.png was saved' % (driver.title, screenshots_path, current_time))
+    logger.info('%s | WantBookTime | %s%s-WantBookTime2.png was saved' % (driver.title, screenshots_path, current_time))
 
     # select all "PlaceBtn"
     btns = driver.find_elements(By.CSS_SELECTOR, "img[name='PlaceBtn']")
