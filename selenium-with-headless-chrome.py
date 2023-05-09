@@ -254,12 +254,23 @@ def AgreeEula():
     driver.switch_to.alert.accept()
 
 
+def adaptiveSleep():
+    now = datetime.now()
+    if now.hour >= 23 and now.minute >= 55:
+        # calcuate adaptive sleep interval, wake up at 24:00 as possible
+        sleep = (60 - now.minute) * 60
+    if sleep <= 0:
+        # min sleep 0.1 sec
+        sleep = 0.1
+    logger.info("Adaptive sleep %d sec" % sleep)
+    time.sleep(sleep)
+
+
 def WantBookDate(date_to_book):
     logger.info("%s | WantBookDate" % driver.title)
 
-    # max retry 10 min
-    sleep = 0.1
-    retry = int((10 * 60) / sleep)
+    # max retry 10 times
+    retry = 10
 
     for i in range(0, retry):
         # wait for page loading
@@ -285,7 +296,8 @@ def WantBookDate(date_to_book):
                 return
 
         # pause and reload page until the desired date is available
-        time.sleep(sleep)
+        # time.sleep(sleep)
+        adaptiveSleep()
         driver.refresh()
 
     # reach max retry
