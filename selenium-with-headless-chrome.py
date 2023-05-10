@@ -255,14 +255,15 @@ def AgreeEula():
 
 
 def adaptiveSleep():
-    target_time = datetime(now.year, now.month, now.day+1, 0, 0, 0)
-    current_time = datetime.now()
-    if current_time.hour >= 23 and current_time.minute >= 59:
-        # calcuate adaptive sleep interval, wake up at 24:00:00 as possible
-        sleep = target_time - current_time
-    if sleep <= 0:
-        # min sleep 0.1 sec
-        sleep = 0.1
+    # min sleep 0.1 sec
+    sleep = 0.1
+
+    # calcuate adaptive sleep interval, wake up at 00:00:00 as possible
+    if now.hour >= 23 and now.minute >= 55:
+        target_time = datetime(now.year, now.month, now.day+1, 0, 0, 0)
+        current_time = datetime.now()
+        sleep = (target_time - current_time).total_seconds()
+
     logger.info("Adaptive sleep %d sec" % sleep)
     time.sleep(sleep)
 
