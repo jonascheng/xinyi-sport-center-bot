@@ -264,7 +264,7 @@ def adaptiveSleep():
         current_time = datetime.now()
         sleep = (target_time - current_time).total_seconds()
 
-    logger.info("Adaptive sleep %d sec" % sleep)
+    logger.info("Adaptive sleep %f sec" % sleep)
     time.sleep(sleep)
 
 
