@@ -283,9 +283,9 @@ def WantBookDate(date_to_book):
 
         # debug purpose
         logger.info('%s | WantBookDate | Retry count %d' % (driver.title, i))
-        if not driver.save_screenshot('%s%s-WantBookDate.png' % (screenshots_path, current_time)):
-            logger.error('%s | WantBookDate | Save WantBookDate failed' % driver.title)
-        logger.info('%s | WantBookDate | (%d) %s%s-WantBookDate.png was saved' % (driver.title, i, screenshots_path, current_time))
+        # if not driver.save_screenshot('%s%s-WantBookDate.png' % (screenshots_path, current_time)):
+        #     logger.error('%s | WantBookDate | Save WantBookDate failed' % driver.title)
+        # logger.info('%s | WantBookDate | (%d) %s%s-WantBookDate.png was saved' % (driver.title, i, screenshots_path, current_time))
 
         # select all "img/NewDataSelect.png"
         btns = driver.find_elements(By.CSS_SELECTOR, "img[src='img/NewDataSelect.png']")
@@ -316,16 +316,16 @@ def WantBookTime(date_to_book):
         raise Exception('%s | WantBookTime | Timed out waiting for page to load' % driver.title)
 
     # debug purpose
-    if not driver.save_screenshot('%s%s-WantBookTime1.png' % (screenshots_path, current_time)):
-        logger.error('%s | WantBookTime | Save WantBookTime failed' % driver.title)
-    logger.info('%s | WantBookTime | %s%s-WantBookTime1.png was saved' % (driver.title, screenshots_path, current_time))
+    # if not driver.save_screenshot('%s%s-WantBookTime1.png' % (screenshots_path, current_time)):
+    #     logger.error('%s | WantBookTime | Save WantBookTime failed' % driver.title)
+    # logger.info('%s | WantBookTime | %s%s-WantBookTime1.png was saved' % (driver.title, screenshots_path, current_time))
 
     # execute script to select afternoon
     driver.execute_script("""
     var date = arguments[0];
     GoToStep2(date, '2');
     """, date_to_book)
-    logger.info("%s | WantBookTime | %s was selected" % (driver.title, date_to_book))
+    logger.info("%s | WantBookTime | %s afternoon was selected" % (driver.title, date_to_book))
 
     # debug purpose
     if not driver.save_screenshot('%s%s-WantBookTime2.png' % (screenshots_path, current_time)):
