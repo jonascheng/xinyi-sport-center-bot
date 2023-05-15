@@ -271,8 +271,8 @@ def adaptiveSleep():
 def WantBookDate(date_to_book):
     logger.info("%s | WantBookDate" % driver.title)
 
-    # max retry 60 times
-    retry = 60
+    # max retry 10 times
+    retry = 10
 
     for i in range(0, retry):
         # wait for page loading
@@ -289,6 +289,8 @@ def WantBookDate(date_to_book):
 
         # select all "img/NewDataSelect.png"
         btns = driver.find_elements(By.CSS_SELECTOR, "img[src='img/NewDataSelect.png']")
+        # search btns in reverse order
+        btns.reverse()
         for btn in btns:
             # logger.info(btn.get_attribute("onclick"))
             if date_to_book in btn.get_attribute("onclick"):
@@ -298,7 +300,6 @@ def WantBookDate(date_to_book):
                 return
 
         # pause and reload page until the desired date is available
-        # time.sleep(sleep)
         adaptiveSleep()
         driver.refresh()
 
@@ -307,7 +308,7 @@ def WantBookDate(date_to_book):
 
 
 def WantBookTime(date_to_book):
-    logger.info("%s | WantBookTime" % driver.title)
+    # logger.info("%s | WantBookTime" % driver.title)
 
     # wait for page loading
     try:
@@ -328,27 +329,30 @@ def WantBookTime(date_to_book):
     logger.info("%s | WantBookTime | %s afternoon was selected" % (driver.title, date_to_book))
 
     # debug purpose
-    if not driver.save_screenshot('%s%s-WantBookTime2.png' % (screenshots_path, current_time)):
-        logger.error('%s | WantBookTime | Save WantBookTime failed' % driver.title)
-    logger.info('%s | WantBookTime | %s%s-WantBookTime2.png was saved' % (driver.title, screenshots_path, current_time))
+    # if not driver.save_screenshot('%s%s-WantBookTime2.png' % (screenshots_path, current_time)):
+    #     logger.error('%s | WantBookTime | Save WantBookTime failed' % driver.title)
+    # logger.info('%s | WantBookTime | %s%s-WantBookTime2.png was saved' % (driver.title, screenshots_path, current_time))
 
     # select all "PlaceBtn"
     btns = driver.find_elements(By.CSS_SELECTOR, "img[name='PlaceBtn']")
+    # filter desired timeslot
+    btns = [btn for btn in btns if DESIRED_BOOK_TIMESLOT in btn.get_attribute("onclick")]
     # loop through all btns in reverse order
     if book_time_in_reverse_order:
         logger.info("%s | WantBookTime | Book time in reverse order" % driver.title)
         btns.reverse()
     for btn in btns:
+        # debug purpose
         # logger.info(btn.get_attribute("onclick"))
-        if DESIRED_BOOK_TIMESLOT in btn.get_attribute("onclick"):
-            m = re.search(r'羽.', btn.get_attribute("onclick"))
-            logger.info('%s | WantBookTime | Intent to select %s ' % (driver.title, m.group()))
-            btn.click()
-            # accept alert
-            driver.switch_to.alert.accept()
-            logger.info('%s | WantBookTime | %s was selected' % (driver.title, m.group()))
-            # early return
-            return m.group()
+        m = re.search(r'羽.', btn.get_attribute("onclick"))
+        logger.info('%s | WantBookTime | Intent to select %s ' % (driver.title, m.group()))
+        btn.click()
+        # accept alert
+        driver.switch_to.alert.accept()
+        logger.info('%s | WantBookTime | %s was selected' % (driver.title, m.group()))
+        # early return
+        return m.group()
+    logger.info("%s | WantBookTime | Note: %d zones are available" % (driver.title, len(btns)))
 
 
 def SaveResult():
