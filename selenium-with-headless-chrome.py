@@ -345,14 +345,13 @@ def WantBookTime(date_to_book):
         # debug purpose
         # logger.info(btn.get_attribute("onclick"))
         m = re.search(r'羽.', btn.get_attribute("onclick"))
-        logger.info('%s | WantBookTime | Intent to select %s ' % (driver.title, m.group()))
+        logger.info('%s | WantBookTime | %d zones are available, and intent to select %s' % (driver.title, len(btns), m.group()))
         btn.click()
         # accept alert
         driver.switch_to.alert.accept()
         logger.info('%s | WantBookTime | %s was selected' % (driver.title, m.group()))
         # early return
         return m.group()
-    logger.info("%s | WantBookTime | Note: %d zones are available" % (driver.title, len(btns)))
 
 
 def SaveResult():
