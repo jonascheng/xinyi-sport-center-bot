@@ -263,7 +263,9 @@ def adaptiveSleep():
         target_time = datetime(now.year, now.month, now.day+1, 0, 0, 0)
         current_time = datetime.now()
         sleep = (target_time - current_time).total_seconds()
-
+    if sleep < 0.1:
+        sleep = 0.1
+        
     logger.info("Adaptive sleep %f sec" % sleep)
     time.sleep(sleep)
 
