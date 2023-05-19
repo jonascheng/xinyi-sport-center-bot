@@ -4,9 +4,10 @@ import time
 import json
 import boto3
 import base64
+import logging
+import pause
 import platform
 import requests
-import logging
 
 from string import Template
 
@@ -256,18 +257,19 @@ def AgreeEula():
 
 def adaptiveSleep():
     # min sleep 0.1 sec
-    sleep = 0.1
+    # sleep = 0.1
 
     # calcuate adaptive sleep interval, wake up at 00:00:00 as possible
     if now.hour >= 23 and now.minute >= 55:
         target_time = datetime(now.year, now.month, now.day+1, 0, 0, 0)
-        current_time = datetime.now()
-        sleep = (target_time - current_time).total_seconds()
-    if sleep < 0.1:
-        sleep = 0.1
-        
-    logger.info("Adaptive sleep %f sec" % sleep)
-    time.sleep(sleep)
+        pause.until(target_time)
+    #     current_time = datetime.now()
+    #     sleep = (target_time - current_time).total_seconds()
+    # if sleep < 0.1:
+    #     sleep = 0.1
+
+    # logger.info("Adaptive sleep %f sec" % sleep)
+    # time.sleep(sleep)
 
 
 def WantBookDate(date_to_book):
@@ -354,6 +356,9 @@ def WantBookTime(date_to_book):
         logger.info('%s | WantBookTime | %s was selected' % (driver.title, m.group()))
         # early return
         return m.group()
+
+    if len(btns) == 0:
+        raise Exception('%s | WantBookTime | None of zones are available' % driver.title)
 
 
 def SaveResult():
