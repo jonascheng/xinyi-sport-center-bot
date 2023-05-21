@@ -255,21 +255,14 @@ def AgreeEula():
     driver.switch_to.alert.accept()
 
 
+# return false if no need to sleep
 def adaptiveSleep():
-    # min sleep 0.1 sec
-    # sleep = 0.1
-
     # calcuate adaptive sleep interval, wake up at 00:00:00 as possible
     if now.hour >= 23 and now.minute >= 55:
         target_time = datetime(now.year, now.month, now.day+1, 0, 0, 0)
         pause.until(target_time)
-    #     current_time = datetime.now()
-    #     sleep = (target_time - current_time).total_seconds()
-    # if sleep < 0.1:
-    #     sleep = 0.1
-
-    # logger.info("Adaptive sleep %f sec" % sleep)
-    # time.sleep(sleep)
+        return True
+    return False
 
 
 def WantBookDate(date_to_book):
@@ -304,8 +297,19 @@ def WantBookDate(date_to_book):
                 return
 
         # pause and reload page until the desired date is available
-        adaptiveSleep()
-        logger.info('%s | WantBookDate | Refresh page' % driver.title)
+        ret = adaptiveSleep()
+        logger.info('%s | WantBookDate | Awake from adaptive sleep with %s' % (driver.title, ret))
+
+        if ret:
+            # try executing script to select the date
+            driver.execute_script("""
+            var date = arguments[0];
+            GoToStep2(date, '1');
+            """, date_to_book)
+            logger.info("%s | WantBookDate | %s was selected" % (driver.title, date_to_book))
+            # early return
+            return
+
         driver.refresh()
 
     # reach max retry
