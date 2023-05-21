@@ -347,7 +347,7 @@ def WantBookTime(date_to_book):
     # filter desired timeslot
     btns = [btn for btn in btns if DESIRED_BOOK_TIMESLOT in btn.get_attribute("onclick")]
     # loop through all btns in reverse order
-    if book_time_in_reverse_orde<r:
+    if book_time_in_reverse_order:
         logger.info("%s | WantBookTime | Book time in reverse order" % driver.title)
         btns.reverse()
     for btn in btns:
