@@ -305,6 +305,7 @@ def WantBookDate(date_to_book):
 
         # pause and reload page until the desired date is available
         adaptiveSleep()
+        logger.info('%s | WantBookDate | Refresh page' % driver.title)
         driver.refresh()
 
     # reach max retry
@@ -342,7 +343,7 @@ def WantBookTime(date_to_book):
     # filter desired timeslot
     btns = [btn for btn in btns if DESIRED_BOOK_TIMESLOT in btn.get_attribute("onclick")]
     # loop through all btns in reverse order
-    if book_time_in_reverse_order:
+    if book_time_in_reverse_orde<r:
         logger.info("%s | WantBookTime | Book time in reverse order" % driver.title)
         btns.reverse()
     for btn in btns:
