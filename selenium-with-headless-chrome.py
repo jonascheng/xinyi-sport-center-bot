@@ -291,8 +291,12 @@ def WantBookDate(date_to_book):
         for btn in btns:
             # logger.info(btn.get_attribute("onclick"))
             if date_to_book in btn.get_attribute("onclick"):
-                btn.click()
-                logger.info("%s | WantBookDate | %s was selected" % (driver.title, date_to_book))
+                # try executing script to select the date
+                driver.execute_script("""
+                var date = arguments[0];
+                GoToStep2(date, '2');
+                """, date_to_book)
+                logger.info("%s | WantBookDate | %s afternoon was selected" % (driver.title, date_to_book))
                 # early return
                 return
 
@@ -304,9 +308,9 @@ def WantBookDate(date_to_book):
             # try executing script to select the date
             driver.execute_script("""
             var date = arguments[0];
-            GoToStep2(date, '1');
+            GoToStep2(date, '2');
             """, date_to_book)
-            logger.info("%s | WantBookDate | %s was selected" % (driver.title, date_to_book))
+            logger.info("%s | WantBookDate | %s afternoon was selected" % (driver.title, date_to_book))
             # early return
             return
 
@@ -331,11 +335,11 @@ def WantBookTime(date_to_book):
     # logger.info('%s | WantBookTime | %s%s-WantBookTime1.png was saved' % (driver.title, screenshots_path, current_time))
 
     # execute script to select afternoon
-    driver.execute_script("""
-    var date = arguments[0];
-    GoToStep2(date, '2');
-    """, date_to_book)
-    logger.info("%s | WantBookTime | %s afternoon was selected" % (driver.title, date_to_book))
+    # driver.execute_script("""
+    # var date = arguments[0];
+    # GoToStep2(date, '2');
+    # """, date_to_book)
+    # logger.info("%s | WantBookTime | %s afternoon was selected" % (driver.title, date_to_book))
 
     # debug purpose
     # if not driver.save_screenshot('%s%s-WantBookTime2.png' % (screenshots_path, current_time)):
