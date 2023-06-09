@@ -34,7 +34,7 @@ RUN cd /usr/share/fonts/chinese/ && unzip Noto_Sans_TC.zip
 RUN cd /usr/share/fonts/chinese/ && fc-cache -fv
 
 # install selenium
-RUN pip install selenium requests icalendar boto3 pause
+RUN pip install selenium==4.9.0 requests icalendar boto3 pause
 
 VOLUME [ "/screenshots" ]
 
