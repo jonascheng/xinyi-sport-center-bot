@@ -58,7 +58,7 @@ RUN ln -s /usr/share/zoneinfo/Singapore /etc/localtime
 
 # download chromedriver
 RUN mkdir /opt/chrome
-RUN curl -O https://chromedriver.storage.googleapis.com/112.0.5615.49/chromedriver_linux64.zip
+RUN curl -O https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
 RUN unzip chromedriver_linux64.zip -d /opt/chrome
 
 # install headless chrome
