@@ -19,6 +19,7 @@ from botocore.exceptions import ClientError
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -76,6 +77,9 @@ date_week_to_book = book_date.strftime("%Y/%m/%d (%A)")
 
 timeout = 5
 
+# init chrome driver
+chrome_service = Service(r'/opt/chrome/chromedriver-linux64/chromedriver')
+
 chrome_options = Options()
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-dev-shm-usage")
@@ -86,10 +90,10 @@ chrome_options.add_argument("--window-size=1024,1024")
 
 screenshots_path = '/screenshots/'
 if platform.system() == 'Windows':
-  driver = webdriver.Chrome(r'chromedriver', chrome_options=chrome_options)
+  driver = webdriver.Chrome(r'chromedriver', options=chrome_options)
   screenshots_path = 'c:\\windows\\temp\\'
 else:
-  driver = webdriver.Chrome(r'/opt/chrome/chromedriver', chrome_options=chrome_options)
+  driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
 
 driver.fullscreen_window()
 driver.get("https://xs.teamxports.com/xs03.aspx?module=login_page&files=login")
@@ -168,6 +172,10 @@ def Login():
         WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.ID, 'subform_List')))
     except TimeoutException:
         raise Exception('%s | Login | Timed out waiting for page to load' % driver.title)
+
+    # accept scam alert
+    scam_ok_btn = driver.find_element(By.CSS_SELECTOR, "button[class='swal2-confirm swal2-styled'")
+    scam_ok_btn.click()
 
     # debug purpose
     # html = driver.page_source
